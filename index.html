@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TRAVELO &mdash; Cinematic Global Location Discovery</title>
+    <meta name="description" content="Explore real locations on Earth with an interactive 3D cinematic globe, reverse geocoding, and verified location photography." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <!-- Three.js & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+
+    <!-- MAIN APP CONTAINER FRAME -->
+    <div class="app-wrapper" id="app-wrapper">
+
+      <!-- HEADER NAVIGATION -->
+      <header id="main-header">
+        <a href="#" class="logo-link" id="home-logo">
+          <div class="logo">
+            <div class="logo-icon">
+              <div class="logo-dot"></div>
+              <div class="logo-ping"></div>
+            </div>
+            <span class="logo-text">TRAVELO</span>
+          </div>
+        </a>
+
+        <nav class="center-nav" id="center-nav">
+          <a href="#" class="nav-item active" id="nav-home">Home</a>
+          <a href="#destinations" class="nav-item" id="nav-destinations">Destinations</a>
+          <a href="#experiences" class="nav-item">Experiences</a>
+          <a href="#about" class="nav-item">About</a>
+          <a href="#blog" class="nav-item">Blog</a>
+          <a href="#contact" class="nav-item">Contact</a>
+        </nav>
+
+        <div class="header-right-actions">
+          <button class="icon-btn search-toggle-btn" id="header-search-toggle" aria-label="Toggle Search">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+
+          <button class="icon-btn theme-toggle-btn" id="theme-toggle" aria-label="Toggle Night Mode">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <div class="auth-buttons" id="nav-links">
+            <a href="login.html" class="btn-login">Login</a>
+            <a href="signup.html" class="btn-signup">Sign Up</a>
+          </div>
+
+          <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- HERO & OVERLAY CONTAINER -->
+      <div class="hero-overlay">
+        
+        <!-- LEFT SIDE CONTENT PANEL -->
+        <div class="hero-left-content">
+          <p class="hero-subtitle">EXPLORE YOUR</p>
+          <h1 class="hero-title">WORLD</h1>
+          <p class="hero-tagline">DISCOVER &bull; EXPLORE &bull; EXPERIENCE</p>
+          <p class="hero-desc">Find any place on Earth. Explore real locations, stunning views, and unforgettable destinations.</p>
+
+          <!-- HERO GLOBAL SEARCH BAR -->
+          <div class="hero-search-wrapper" id="search-container">
+            <div class="search-box">
+              <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input 
+                type="text" 
+                id="global-search-input" 
+                placeholder="Search a city, country, landmark or place..." 
+                autocomplete="off"
+              />
+              <button class="search-clear-btn" id="search-clear-btn" aria-label="Clear search">&times;</button>
+              <button class="search-btn" id="search-submit-btn">EXPLORE &rarr;</button>
+            </div>
+            <!-- Search Autocomplete Dropdown -->
+            <div class="search-results-dropdown" id="search-results-dropdown"></div>
+          </div>
+
+          <!-- POPULAR DESTINATIONS CHIPS -->
+          <div class="popular-destinations-section">
+            <h4 class="popular-label">POPULAR DESTINATIONS</h4>
+            <div class="popular-chips-grid">
+              <button class="chip-btn" data-query="Kakinada, Andhra Pradesh, India">
+                <img src="https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=400&auto=format&fit=crop" alt="Kakinada" referrerpolicy="no-referrer" />
+                <span>Kakinada</span>
+              </button>
+              <button class="chip-btn" data-query="Taj Mahal, Agra, India">
+                <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=400&auto=format&fit=crop" alt="Taj Mahal" referrerpolicy="no-referrer" />
+                <span>Taj Mahal</span>
+              </button>
+              <button class="chip-btn" data-query="Tokyo, Japan">
+                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&auto=format&fit=crop" alt="Tokyo" referrerpolicy="no-referrer" />
+                <span>Tokyo</span>
+              </button>
+              <button class="chip-btn" data-query="Paris, France">
+                <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&auto=format&fit=crop" alt="Paris" referrerpolicy="no-referrer" />
+                <span>Paris</span>
+              </button>
+              <button class="chip-btn" data-query="Mount Everest, Nepal">
+                <img src="https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=400&auto=format&fit=crop" alt="Mount Everest" referrerpolicy="no-referrer" />
+                <span>Mount Everest</span>
+              </button>
+              <button class="chip-btn" data-query="Zhangjiajie, Hunan, China">
+                <img src="https://images.unsplash.com/photo-1513415277900-a62401e19be4?w=400&auto=format&fit=crop" alt="Zhangjiajie" referrerpolicy="no-referrer" />
+                <span>Zhangjiajie</span>
+              </button>
+              <button class="chip-btn" data-query="Bali, Indonesia">
+                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&auto=format&fit=crop" alt="Bali" referrerpolicy="no-referrer" />
+                <span>Bali</span>
+              </button>
+              <button class="chip-btn" data-query="New York, USA">
+                <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&auto=format&fit=crop" alt="New York" referrerpolicy="no-referrer" />
+                <span>New York</span>
+              </button>
+              <button class="chip-btn" data-query="Dubai, UAE">
+                <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&auto=format&fit=crop" alt="Dubai" referrerpolicy="no-referrer" />
+                <span>Dubai</span>
+              </button>
+              <button class="chip-btn" data-query="Amazon Rainforest, Brazil">
+                <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&auto=format&fit=crop" alt="Amazon" referrerpolicy="no-referrer" />
+                <span>Amazon</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE FLOATING GLASSMORPHISM LOCATION CARD -->
+        <aside class="location-panel" id="location-panel">
+          <button class="panel-close-btn" id="panel-close-btn" aria-label="Close panel">&times;</button>
+
+          <!-- FEATURED IMAGE & THUMBNAILS GALLERY -->
+          <div class="panel-media-section">
+            <div class="featured-image-container">
+              <img id="panel-main-img" src="" alt="Location view" referrerpolicy="no-referrer" />
+              <div class="img-badge" id="img-source-badge">Verified Location Photo</div>
+              <div class="img-loader" id="img-loader">
+                <div class="spinner"></div>
+              </div>
+            </div>
+            <div class="image-gallery-thumbs" id="panel-gallery-thumbs"></div>
+          </div>
+
+          <!-- CARD HEADER & METADATA -->
+          <div class="panel-header">
+            <div class="title-weather-row">
+              <div>
+                <h2 class="panel-title" id="panel-title">Paris</h2>
+                <div class="country-row">
+                  <span class="flag-icon" id="panel-flag">🇫🇷</span>
+                  <span class="panel-region" id="panel-region">France</span>
+                </div>
+              </div>
+              <div class="weather-badge" id="panel-weather">
+                <svg width="14" height="14" fill="none" stroke="#ffb703" stroke-width="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                </svg>
+                <span id="weather-text">18&deg;C Clear</span>
+              </div>
+            </div>
+
+            <div class="coords-badge" id="panel-coords">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"></path>
+                <circle cx="12" cy="9" r="2.5"></circle>
+              </svg>
+              <span id="panel-latlon">48.8566&deg; N, 2.3522&deg; E</span>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION & EXTRA STATS -->
+          <div class="panel-body">
+            <p id="panel-description" class="panel-description">Paris, the capital of France, is known for its art, fashion, culture and iconic landmarks...</p>
+
+            <div class="location-stats-row">
+              <div class="stat-item">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div>
+                  <span class="stat-label">Best Time</span>
+                  <span class="stat-val" id="stat-besttime">Mar - May</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+                <div>
+                  <span class="stat-label">Currency</span>
+                  <span class="stat-val" id="stat-currency">EUR (&euro;)</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <div>
+                  <span class="stat-label">Language</span>
+                  <span class="stat-val" id="stat-language">French</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD ACTION BUTTON -->
+          <div class="panel-actions">
+            <button class="btn-primary" id="btn-explore-location">
+              EXPLORE LOCATION &rarr;
+            </button>
+          </div>
+        </aside>
+      </div><!-- /hero-overlay -->
+
+      <!-- 3D GLOBE CONTAINER -->
+      <div id="webgl-container"></div>
+
+      <!-- 2D OVERLAY HTML FOR 3D GLOBE MARKERS -->
+      <div id="globe-markers-container">
+        <!-- Dynamic markers generated by JS -->
+      </div>
+
+      <!-- HOVER TOOLTIP FOR GLOBE -->
+      <div id="globe-tooltip" class="globe-tooltip">
+        <span id="tooltip-text">Click anywhere to discover location</span>
+      </div>
+
+      <!-- BOTTOM DESTINATION CARDS GRID (AS IN REFERENCE IMAGE) -->
+      <div class="bottom-destinations-bar" id="destinations">
+        <div class="dest-cards-scroll">
+          <div class="dest-card" data-query="India">
+            <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&auto=format&fit=crop" alt="India" referrerpolicy="no-referrer" />
+            <div class="dest-card-info">
+              <h3>India</h3>
+              <p>Taj Mahal, Goa, Kerala...</p>
+            </div>
+            <button class="dest-card-arrow">&rarr;</button>
+          </div>
+
+          <div class="dest-card" data-query="Japan">
+            <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop" alt="Japan" referrerpolicy="no-referrer" />
+            <div class="dest-card-info">
+              <h3>Japan</h3>
+              <p>Tokyo, Kyoto, Mount Fuji...</p>
+            </div>
+            <button class="dest-card-arrow">&rarr;</button>
+          </div>
+
+          <div class="dest-card" data-query="Switzerland">
+            <img src="https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?w=600&auto=format&fit=crop" alt="Switzerland" referrerpolicy="no-referrer" />
+            <div class="dest-card-info">
+              <h3>Switzerland</h3>
+              <p>Alps, Interlaken, Zurich...</p>
+            </div>
+            <button class="dest-card-arrow">&rarr;</button>
+          </div>
+
+          <div class="dest-card" data-query="USA">
+            <img src="https://images.unsplash.com/photo-1508433957232-3107f5fd5995?w=600&auto=format&fit=crop" alt="USA" referrerpolicy="no-referrer" />
+            <div class="dest-card-info">
+              <h3>USA</h3>
+              <p>New York, Grand Canyon...</p>
+            </div>
+            <button class="dest-card-arrow">&rarr;</button>
+          </div>
+
+          <div class="dest-card" data-query="Australia">
+            <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=600&auto=format&fit=crop" alt="Australia" referrerpolicy="no-referrer" />
+            <div class="dest-card-info">
+              <h3>Australia</h3>
+              <p>Sydney, Great Barrier Reef...</p>
+            </div>
+            <button class="dest-card-arrow">&rarr;</button>
+          </div>
+
+          <div class="dest-card view-all-card" id="btn-view-all-dest">
+            <div class="view-all-circle">&rarr;</div>
+            <span>View All Destinations</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /app-wrapper -->
+
+    <script src="app.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

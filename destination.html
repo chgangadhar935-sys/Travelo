@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explore Location &mdash; TRAVELO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="destination-page-body">
+
+    <div class="app-wrapper full-dest-wrapper">
+      <header id="main-header">
+        <a href="index.html" class="logo-link">
+          <div class="logo">
+            <div class="logo-icon"><div class="logo-dot"></div></div>
+            <span class="logo-text">TRAVELO</span>
+          </div>
+        </a>
+        <nav class="nav-links">
+          <a href="index.html" class="btn-login">&larr; BACK TO GLOBE</a>
+        </nav>
+      </header>
+
+      <div class="dest-bg" id="dest-bg"></div>
+      <div class="dest-overlay"></div>
+
+      <div class="dest-content">
+        <div class="dest-info-wrap">
+          <p class="dest-region" id="dest-region">LOADING REGION...</p>
+          <h1 class="dest-title" id="dest-title">LOADING LOCATION...</h1>
+          <p class="dest-coords" id="dest-coords">LAT 00.0000&deg;, LON 00.0000&deg;</p>
+          <p class="dest-summary-text" id="dest-summary-text">Fetching verified details and images for this location...</p>
+        </div>
+
+        <!-- Dynamic Verified Photo Gallery Grid -->
+        <div class="dest-verified-gallery" id="dest-verified-gallery"></div>
+
+        <!-- Booking Bar -->
+        <div class="booking-bar" id="booking-bar">
+          <div class="booking-field">
+            <label>Check in</label>
+            <input type="text" id="checkin" placeholder="DD/MM/YYYY" onfocus="(this.type='date')" />
+          </div>
+          <div class="booking-divider"></div>
+          <div class="booking-field">
+            <label>Check out</label>
+            <input type="text" id="checkout" placeholder="DD/MM/YYYY" onfocus="(this.type='date')" />
+          </div>
+          <div class="booking-divider"></div>
+          <div class="booking-field">
+            <label>Adults</label>
+            <select id="adults">
+              <option value="1">1 Adult</option>
+              <option value="2" selected>2 Adults</option>
+              <option value="3">3 Adults</option>
+              <option value="4">4 Adults</option>
+            </select>
+          </div>
+          <button class="booking-search-btn" id="dest-search-btn" aria-label="Search">
+            <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+      if (localStorage.getItem('travelo_theme') === 'light') {
+        document.body.classList.add('light-theme');
+      }
+
+      // Parse URL Parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const locName = urlParams.get('name') || urlParams.get('id') || 'Global Discovery';
+      const lat = parseFloat(urlParams.get('lat')) || 0;
+      const lon = parseFloat(urlParams.get('lon')) || 0;
+      const country = urlParams.get('country') || '';
+      const state = urlParams.get('state') || '';
+
+      document.getElementById('dest-title').textContent = locName.toUpperCase();
+      document.getElementById('dest-region').textContent = (country || state || 'LOCATION').toUpperCase();
+      document.getElementById('dest-coords').textContent = `${lat > 0 ? lat.toFixed(4) + '\u00B0 N' : Math.abs(lat).toFixed(4) + '\u00B0 S'}, ${lon > 0 ? lon.toFixed(4) + '\u00B0 E' : Math.abs(lon).toFixed(4) + '\u00B0 W'}`;
+
+      const FAMOUS_UNRELATED = [
+        "taj mahal", "eiffel tower", "colosseum", "statue of liberty", "pyramid", "machu picchu",
+        "great wall", "christ the redeemer", "petra", "big ben", "burj khalifa", "mount fuji"
+      ];
+
+      // Fetch Verified Images & Info for this location dynamically
+      async function loadDestinationData() {
+        const query = `${locName} ${state} ${country}`.trim();
+        const galleryEl = document.getElementById('dest-verified-gallery');
+        const bgEl = document.getElementById('dest-bg');
+        const summaryEl = document.getElementById('dest-summary-text');
+
+        try {
+          // 1. Wikipedia summary
+          const wikiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(locName)}`;
+          const wikiRes = await fetch(wikiUrl);
+          let leadImage = null;
+          if (wikiRes.ok) {
+            const wikiData = await wikiRes.json();
+            if (wikiData.extract) summaryEl.textContent = wikiData.extract;
+            if (wikiData.originalimage && wikiData.originalimage.source) {
+              leadImage = wikiData.originalimage.source;
+            }
+          }
+
+          // 2. Wikipedia search images with strict relevance
+          const wikiSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=6&prop=pageimages|extracts&piprop=original|thumbnail&pithumbsize=1200&exintro=1&explaintext=1&format=json&origin=*`;
+          const wikiRes2 = await fetch(wikiSearchUrl);
+          let verifiedImages = [];
+
+          if (leadImage) verifiedImages.push(leadImage);
+
+          if (wikiRes2.ok) {
+            const wikiData2 = await wikiRes2.json();
+            if (wikiData2.query && wikiData2.query.pages) {
+              const pages = Object.values(wikiData2.query.pages);
+              pages.forEach(p => {
+                const imgObj = p.original || p.thumbnail;
+                if (imgObj && imgObj.source) {
+                  const title = (p.title || "").toLowerCase();
+                  const locKey = locName.toLowerCase();
+                  
+                  // Check famous unrelated
+                  let isUnrelated = false;
+                  for (const landmark of FAMOUS_UNRELATED) {
+                    if (title.includes(landmark) && !locKey.includes(landmark)) {
+                      isUnrelated = true;
+                      break;
+                    }
+                  }
+
+                  if (!isUnrelated && (title.includes(locKey) || title.includes(country.toLowerCase()) || title.includes(state.toLowerCase()))) {
+                    verifiedImages.push(imgObj.source);
+                  }
+                }
+              });
+            }
+          }
+
+          const unique = Array.from(new Set(verifiedImages));
+
+          if (unique.length > 0) {
+            bgEl.style.backgroundImage = `url('${unique[0]}')`;
+            galleryEl.innerHTML = unique.slice(0, 4).map(imgUrl => `
+              <div class="dest-thumb-box">
+                <img src="${imgUrl}" alt="${locName}" onclick="document.getElementById('dest-bg').style.backgroundImage='url(${imgUrl})'" />
+              </div>
+            `).join('');
+          } else {
+            galleryEl.innerHTML = `
+              <div class="no-verified-image-box" style="grid-column: 1 / -1; padding: 40px; background: rgba(8,18,38,0.85);">
+                <svg width="32" height="32" fill="none" stroke="#00e5ff" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>No verified image available for this exact location.</span>
+              </div>
+            `;
+          }
+        } catch (err) {
+          console.warn("Destination page error:", err);
+        }
+      }
+
+      loadDestinationData();
+
+      document.getElementById('dest-search-btn').addEventListener('click', () => {
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(locName + ' travel hotels flights')}`, '_blank');
+      });
+    </script>
+  </body>
+</html>

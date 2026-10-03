@@ -1,0 +1,56 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up &mdash; TRAVELO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="destination-page-body">
+    <div class="app-wrapper full-dest-wrapper">
+      <header id="main-header">
+        <a href="index.html" class="logo-link">
+          <div class="logo">
+            <div class="logo-icon"><div class="logo-dot"></div></div>
+            <span class="logo-text">TRAVELO</span>
+          </div>
+        </a>
+        <nav class="nav-links">
+          <a href="index.html" class="btn-login">&larr; BACK TO GLOBE</a>
+        </nav>
+      </header>
+
+      <div class="auth-page">
+        <div class="auth-box">
+          <h2>Create Account</h2>
+          <p>Join TRAVELO to discover any location on Earth</p>
+          <form id="signup-form">
+            <input type="text" id="name" placeholder="Full Name" required />
+            <input type="email" id="email" placeholder="Email Address" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <p class="error-msg" id="error-msg"></p>
+            <button type="submit" class="auth-submit">CREATE ACCOUNT</button>
+          </form>
+          <p class="auth-switch">Already have an account? <a href="login.html">Login</a></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+      document.getElementById('signup-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const pass = document.getElementById('password').value.trim();
+
+        if (Auth.signup(name, email, pass)) {
+          window.location.href = 'index.html';
+        } else {
+          document.getElementById('error-msg').textContent = "Account with this email already exists";
+        }
+      });
+    </script>
+  </body>
+</html>

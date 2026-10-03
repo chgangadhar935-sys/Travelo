@@ -1,0 +1,66 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile &mdash; TRAVELO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="destination-page-body">
+    <div class="app-wrapper full-dest-wrapper">
+      <header id="main-header">
+        <a href="index.html" class="logo-link">
+          <div class="logo">
+            <div class="logo-icon"><div class="logo-dot"></div></div>
+            <span class="logo-text">TRAVELO</span>
+          </div>
+        </a>
+        <nav class="nav-links">
+          <a href="index.html" class="btn-login">&larr; BACK TO GLOBE</a>
+        </nav>
+      </header>
+
+      <div class="auth-page">
+        <div class="auth-box">
+          <div style="width:60px; height:60px; border-radius:50%; background:#00e5ff; color:#020714; font-size:24px; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto;" id="avatar-initials">U</div>
+          <h2 id="user-name">Explorer</h2>
+          <p id="user-email">user@travelo.app</p>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;">
+            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+              <span style="display:block; font-size:20px; font-weight:800; color:#00e5ff;">12</span>
+              <span style="font-size:11px; color:rgba(255,255,255,0.6);">Explorations</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+              <span style="display:block; font-size:20px; font-weight:800; color:#00e5ff;">5</span>
+              <span style="font-size:11px; color:rgba(255,255,255,0.6);">Saved Places</span>
+            </div>
+          </div>
+
+          <a href="index.html" class="auth-submit" style="display:block; text-decoration:none;">EXPLORE 3D GLOBE</a>
+          <button class="btn-login" id="profile-logout-btn" style="margin-top: 10px; width:100%; cursor:pointer;">LOG OUT</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const user = Auth.getUser();
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        document.getElementById('user-name').textContent = user.name || 'Global Explorer';
+        document.getElementById('user-email').textContent = user.email || 'explorer@travelo.app';
+        document.getElementById('avatar-initials').textContent = (user.name || 'U').charAt(0).toUpperCase();
+
+        document.getElementById('profile-logout-btn').addEventListener('click', () => {
+          Auth.logout();
+        });
+      });
+    </script>
+  </body>
+</html>
